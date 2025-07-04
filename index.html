@@ -40,14 +40,22 @@
         1100
       );
 
-      const texture = new THREE.TextureLoader().load("Lucero360_01.png", () =>
-        renderer.render(scene, camera)
-      );
-      texture.mapping = THREE.EquirectangularReflectionMapping;
+      const images = [
+        "Lucero360_01.png",
+        "Lucero360_02.png",
+        "Lucero360_03.png",
+        "Lucero360_04.png",
+      ];
+
+      const materials = images.map((image) => {
+        const texture = new THREE.TextureLoader().load(image);
+        texture.mapping = THREE.EquirectangularReflectionMapping;
+        return new THREE.MeshBasicMaterial({ map: texture });
+      });
 
       const sphere = new THREE.Mesh(
         new THREE.SphereGeometry(500, 60, 40).scale(-1, 1, 1),
-        new THREE.MeshBasicMaterial({ map: texture })
+        materials[0]
       );
       scene.add(sphere);
 
@@ -62,6 +70,12 @@
         camera.updateProjectionMatrix();
         renderer.setSize(innerWidth, innerHeight);
       });
+
+      let currentIndex = 0;
+      setInterval(() => {
+        currentIndex = (currentIndex + 1) % materials.length;
+        sphere.material = materials[currentIndex];
+      }, 3000);
 
       (function animate() {
         requestAnimationFrame(animate);
