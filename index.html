@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Renova Configurator</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: #000;
+      }
+
+      canvas {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+        }
+      }
+    </script>
+    <script type="module">
+      import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
+      import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js";
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(innerWidth, innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        innerWidth / innerHeight,
+        1,
+        1100
+      );
+
+      const texture = new THREE.TextureLoader().load("Lucero360_01.png", () =>
+        renderer.render(scene, camera)
+      );
+      texture.mapping = THREE.EquirectangularReflectionMapping;
+
+      const sphere = new THREE.Mesh(
+        new THREE.SphereGeometry(500, 60, 40).scale(-1, 1, 1),
+        new THREE.MeshBasicMaterial({ map: texture })
+      );
+      scene.add(sphere);
+
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableZoom = false;
+      controls.enablePan = false;
+      camera.position.set(0, 0, 0.1);
+      controls.update();
+
+      window.addEventListener("resize", () => {
+        camera.aspect = innerWidth / innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(innerWidth, innerHeight);
+      });
+
+      (function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+      })();
+    </script>
+  </body>
+</html>
